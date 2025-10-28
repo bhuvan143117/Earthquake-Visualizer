@@ -1,6 +1,6 @@
-# Volcano Eruption Mapping
+# Earthquake Visualizer
 Created by N.Bhuvaneshwar
-This Project Visualizes the Volcano eruptions and Earthquake data on an interactive map.
+This Project Visualizes the Earthquake data on an interactive map.
 It uses Leaflet.js and GeoJSON data to display active regions with real time updates.
 
 > Interactive maps using jQuery, Leaflet, GeoJSON data to map earthquakes.
