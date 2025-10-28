@@ -1,121 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Earthquake Visualizer</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #f4f6f9;
+    }
+    header {
+      background-color: #283593;
+      color: white;
+      padding: 15px 0;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    h2 {
+      color: #444;
+      margin-top: 20px;
+    }
+    #map {
+      height: 85vh;
+      width: 90%;
+      margin: 20px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    footer {
+      background: #1a237e;
+      color: white;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+    a {
+      color: #ffeb3b;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>🌍 Earthquake Visualizer</header>
+  <h2>Earthquake & Seismic Mapping</h2>
 
-    <title>Volcano Visualizer</title>
+  <div id="map"></div>
 
-    <meta
-      name="description"
-      content="Interactive Volcano and Seismic Mapping using GeoJSON data and Leaflet.js."
-    />
-    <meta name="theme-color" content="#d9534f" />
+  <footer>
+    Data Source: <a href="https://earthquake.usgs.gov/" target="_blank">USGS Earthquake Program</a> |
+    Created by <b>Bhuvaneshwar</b>
+  </footer>
 
-    <link 
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="./static/favicon/favicon-32x32.png"
-    />
+  <script>
+    // Initialize the map
+    var map = L.map('map').setView([20, 0], 2);
 
-    <!-- Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    />
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
 
-    <!-- Bootstrap CSS (Optional) -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-
-  <body id="page-top">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">VOLCANO VISUALIZER</a>
-    </nav>
-
-    <!-- Page Content -->
-    <main class="container-fluid p-0 mt-5">
-      <!-- About Section -->
-      <section class="p-5 text-center bg-light">
-        <h1 class="display-3 text-danger">Volcano Visualizer</h1>
-        <p class="lead">
-          This interactive map visualizes volcano eruptions and nearby seismic
-          activity using GeoJSON data and Leaflet.js.
-        </p>
-      </section>
-
-      <hr class="m-0" />
-
-      <!-- Volcano Mapping Section -->
-      <section class="p-4">
-        <h2 class="display-4 text-center mb-3">Volcano & Seismic Mapping</h2>
-        <div id="map" style="height: 600px;"></div>
-      </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="text-center bg-dark text-white p-3 mt-4">
-      <p class="m-0">
-        Data Source:
-        <a
-          href="https://earthquake.usgs.gov/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-warning"
-          >USGS Earthquake Program</a
-        >
-        | Created by <strong>Bhuvaneshwar</strong>
-      </p>
-    </footer>
-
-    <!-- Leaflet JS -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    ></script>
-
-    <!-- JS for Map -->
-    <script>
-      // Initialize map
-      var map = L.map("map").setView([20, 0], 2);
-
-      // Add tile layer
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 8,
-        attribution: "© OpenStreetMap contributors",
-      }).addTo(map);
-
-      // Fetch live data (USGS as sample for seismic/volcano activity)
-      fetch(
-        "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          L.geoJSON(data, {
-            pointToLayer: function (feature, latlng) {
-              return L.circleMarker(latlng, {
-                radius: 6,
-                fillColor: "#ff4500",
-                color: "#b22222",
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.8,
-              });
-            },
-            onEachFeature: function (feature, layer) {
-              layer.bindPopup(
-                `<strong>Location:</strong> ${feature.properties.place}<br>
-                 <strong>Magnitude:</strong> ${feature.properties.mag}`
-              );
-            },
-          }).addTo(map);
-        })
-        .catch((err) => console.error("Error loading data:", err));
-    </script>
-  </body>
+    // Fetch earthquake data
+    fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson')
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, {
+              radius: feature.properties.mag * 2,
+              fillColor: 'red',
+              color: '#800',
+              weight: 1,
+              fillOpacity: 0.7
+            });
+          },
+          onEachFeature: function (feature, layer) {
+            layer.bindPopup(
+              `<b>Location:</b> ${feature.properties.place}<br>
+               <b>Magnitude:</b> ${feature.properties.mag}<br>
+               <b>Time:</b> ${new Date(feature.properties.time).toLocaleString()}`
+            );
+          }
+        }).addTo(map);
+      })
+      .catch(error => {
+        console.error('Error loading earthquake data:', error);
+        alert('Could not load data. Please try again later.');
+      });
+  </script>
+</body>
 </html>
